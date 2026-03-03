@@ -1,0 +1,15 @@
+# Environments
+venv/
+env/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Vector DB data
+chroma_db/
+qdrant_storage/
+
+# OS generated files
+.DS_Store
