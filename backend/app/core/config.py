@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     # Groq / LLM
     groq_api_key: str = Field(..., env="GROQ_API_KEY")
     groq_model_name: str = Field(
-        default="llama-3-70b-versatile",
+        default="llama3-70b-8192",
         env="GROQ_MODEL_NAME",
     )
 
