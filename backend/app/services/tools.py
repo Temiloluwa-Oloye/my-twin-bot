@@ -20,11 +20,18 @@ async def get_latest_github_commits(username: str) -> str:
             return f"{username} has no recent public commits."
             
         result = f"Latest public GitHub activity for {username}:\n"
+        result = f"Latest public GitHub activity for {username}:\n"
         for event in push_events:
             repo_name = event["repo"]["name"]
             commits = event["payload"].get("commits", [])
+            
+            # If the push event has no explicit commit messages, just list the repo
+            if not commits:
+                result += f"- Pushed updates to repository: {repo_name} (No commit details available)\n"
+            
+            # If it does have commit messages, list them out
             for commit in commits:
-                message = commit['message'].split('\n')[0][:100] 
+                message = commit.get("message", "Update").split('\n')[0][:100] 
                 result += f"- Repository: {repo_name} | Commit: {message}\n"
                 
         return result
