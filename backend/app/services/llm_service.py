@@ -69,6 +69,8 @@ class LLMService:
 
                     # Execute our actual Python function
                     tool_result = await get_latest_github_commits(username)
+                    
+                    print(f"📦 [RAW TOOL DATA] {tool_result}")
 
                     # Append the result back to the conversation
                     messages.append({
