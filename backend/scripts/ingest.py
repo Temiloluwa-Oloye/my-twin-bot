@@ -26,8 +26,12 @@ def compute_id(text: str, source: str) -> str:
 def ingest() -> None:
     settings = get_settings()
 
-    project_root = Path(__file__).resolve().parents[2]
-    data_dir = project_root / "backend" / "app" / "data"
+    current_dir = Path(__file__).resolve()
+    # Traverse up until we hit the 'backend' folder
+    while current_dir.name != 'backend' and current_dir.parent != current_dir:
+        current_dir = current_dir.parent
+    
+    data_dir = current_dir / "app" / "data"
     if not data_dir.exists():
         raise RuntimeError(f"Data directory does not exist: {data_dir}")
 

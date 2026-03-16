@@ -30,7 +30,7 @@ class Settings(BaseSettings):
         env="EMBEDDING_MODEL_NAME",
     )
     chroma_db_dir: str = Field(
-        default=str(PROJECT_ROOT / "backend" / "app" / "data" / "chroma_db"),
+        default=str(PROJECT_ROOT / "app" / "data" / "chroma_db"),
         env="CHROMA_DB_DIR",
     )
     chroma_collection: str = Field(
