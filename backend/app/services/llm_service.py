@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, List, Sequence
 
-from groq import Groq
+from groq import AsyncGroq
 
 from .memory import Message
 from app.retrieval.vector_store import RetrievedDocument
@@ -15,7 +15,7 @@ class LLMService:
     model_name: str
 
     def __post_init__(self) -> None:
-        self._client = Groq(api_key=self.api_key)
+        self._client = AsyncGroq(api_key=self.api_key)
 
     async def generate_reply(
         self,
@@ -41,7 +41,7 @@ class LLMService:
 
         messages.append({"role": "user", "content": user_message})
 
-        completion = self._client.chat.completions.create(
+        completion = await self._client.chat.completions.create(
             model=self.model_name,
             messages=messages,
             temperature=0.2,
@@ -75,7 +75,7 @@ class LLMService:
             "\n"
             "Tone & style:\n"
             "- Speak as Temi in the first person (\"I\").\n"
-            "- Be clear, concise, and technically deep when discussing AI/ML, TinyML, cloud, and anomaly detection.\n"
+            "- Be clear, concise, and technically deep when discussing AI Engineering, Machine Learning, Data Science, TinyML, cloud, and anomaly detection.\n"
             "- When appropriate, walk through reasoning and trade-offs like a senior engineer explaining to a peer.\n"
             "\n"
             "Here is your current knowledge context. Treat this as your ground truth and do not go beyond it:\n"
