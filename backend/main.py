@@ -4,9 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router as api_router
 from app.core.config import get_settings
-from app.retrieval.embedder import LocalEmbedder
-from app.retrieval.vector_store import ChromaVectorStore
-from app.services.llm_service import LLMService
 from app.services.memory import InMemorySessionMemory
 
 # A thread lock to ensure only the first request triggers the model download
@@ -30,11 +27,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # 1. Initialize fast components only
+    # Initialize fast components only
     app.state.settings = settings
     app.state.memory = InMemorySessionMemory()
     
-    # 2. Leave heavy ML components empty for now (Lazy Loading)
     app.state.embedder = None
     app.state.vector_store = None
     app.state.llm_service = None
@@ -46,18 +42,19 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
-# 3. The Lazy Loading Middleware
 @app.middleware("http")
 async def lazy_load_components(request: Request, call_next):
-    # Check if this is the very first request
     if not getattr(request.app.state, "models_loaded", False):
         with model_lock:
-            # Double-check inside the lock to prevent race conditions
             if not getattr(request.app.state, "models_loaded", False):
                 print("🚀 First request received! Waking up AI models... (This takes 1-2 mins)")
                 settings = request.app.state.settings
                 
-                # Now we safely load the heavy models in the background
+                # 🚨 TRUE LAZY LOADING: We only import the heavy files HERE!
+                from app.retrieval.embedder import LocalEmbedder
+                from app.retrieval.vector_store import ChromaVectorStore
+                from app.services.llm_service import LLMService
+                
                 request.app.state.embedder = LocalEmbedder(model_name=settings.embedding_model_name)
                 request.app.state.vector_store = ChromaVectorStore(
                     persist_directory=settings.chroma_db_dir,
