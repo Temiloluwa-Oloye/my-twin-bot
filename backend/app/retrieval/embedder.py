@@ -1,17 +1,19 @@
-from typing import Iterable, List
+import os
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-from sentence_transformers import SentenceTransformer
-
-
-class LocalEmbedder:
-    """HuggingFace sentence-transformers embedder running locally."""
-
-    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2") -> None:
-        self._model = SentenceTransformer(model_name)
-
-    def embed_texts(self, texts: Iterable[str]) -> List[List[float]]:
-        return [embedding.tolist() for embedding in self._model.encode(list(texts), convert_to_numpy=True)]
-
-    def embed_query(self, text: str) -> List[float]:
-        return self.embed_texts([text])[0]
-
+class LocalEmbedder(GoogleGenerativeAIEmbeddings):
+    """
+    A drop-in replacement that hijacks the old local embedder class 
+    and routes all embedding math to Google's blazing-fast Gemini API.
+    """
+    def __init__(self, model_name: str = None, **kwargs):
+        # We ignore the old local model_name and force Gemini
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY is missing from environment variables!")
+            
+        super().__init__(
+            model="models/text-embedding-004", 
+            google_api_key=api_key,
+            **kwargs
+        )
