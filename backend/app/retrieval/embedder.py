@@ -1,5 +1,9 @@
 import os
+from dotenv import load_dotenv, find_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+# find_dotenv() explicitly hunts down the .env file in your folder tree
+load_dotenv(find_dotenv())
 
 class LocalEmbedder(GoogleGenerativeAIEmbeddings):
     """
@@ -10,10 +14,10 @@ class LocalEmbedder(GoogleGenerativeAIEmbeddings):
         # We ignore the old local model_name and force Gemini
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("GEMINI_API_KEY is missing from environment variables!")
+            raise ValueError("GEMINI_API_KEY is missing! Python still can't find your .env file.")
             
         super().__init__(
-            model="models/text-embedding-004", 
+            model="models/gemini-embedding-001", 
             google_api_key=api_key,
             **kwargs
         )
