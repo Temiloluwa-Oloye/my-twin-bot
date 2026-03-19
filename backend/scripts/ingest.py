@@ -68,7 +68,7 @@ def ingest() -> None:
 
         print(f"Chunking {source}: {len(chunks)} chunks")
 
-        embeddings = embedder.embed_texts(chunks)
+        embeddings = embedder.embed_documents(chunks)
 
         for text, embedding in zip(chunks, embeddings):
             doc_id = compute_id(text, source)
